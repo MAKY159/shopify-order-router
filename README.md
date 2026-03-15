@@ -28,7 +28,7 @@ Fill in `.env` with your credentials.
 
 **Shopify** - Admin API access token (`shpat_...`) with `read_orders` and `write_orders` scopes.
 
-**ShipBob** - Personal Access Token from Integrations → API Tokens. Channel ID from `GET https://api.shipbob.com/2026-01/channel` — use the one with `orders_write` scope.
+**ShipBob** - Personal Access Token from Integrations → API Tokens. Channel ID from `GET https://api.shipbob.com/2026-01/channel` - use the one with `orders_write` scope.
 
 **DCL** - HTTP Basic Auth (username + password). Account number included in every order payload.
 
@@ -45,7 +45,7 @@ docker build -t shopify-order-router .
 docker run --env-file .env shopify-order-router
 ```
 
-`DRY_RUN=true` by default — logs payloads without sending. `ORDERS_SINCE` defaults to start of today UTC. `LOG_LEVEL` defaults to INFO.
+`DRY_RUN=true` by default - logs payloads without sending. `ORDERS_SINCE` defaults to start of today UTC. `LOG_LEVEL` defaults to INFO.
 
 Script exits with code `1` if any orders failed to dispatch, so it can be monitored by a scheduler or alerting system.
 
@@ -55,7 +55,7 @@ To add a third warehouse (e.g. Canada), four things need changing:
 
 1. Add `CA = "CA"` to `Warehouse` enum in `src/router.py`
 
-2. Add a routing rule in `src/router.py` — rules are evaluated in registration order, so add higher-priority rules before lower-priority ones:
+2. Add a routing rule in `src/router.py` - rules are evaluated in registration order, so add higher-priority rules before lower-priority ones:
 
 ```python
 @register
@@ -82,4 +82,4 @@ python -m unittest discover -s tests -v
 - If a line item has no SKU, falls back to `variant.sku`
 - Shipping method/carrier/service are configurable via env vars
 - The EU warehouse endpoint in the task (`developer.shipbob.com/api/channels/get-channels`) is the ShipBob docs site, not an order submission endpoint. The actual Orders API is `POST https://api.shipbob.com/2026-01/order` per ShipBob documentation
-- Routing rules are evaluated in registration order — EU before US by design
+- Routing rules are evaluated in registration order - EU before US by design
