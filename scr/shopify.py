@@ -11,14 +11,15 @@ from .config import settings
 logger = logging.getLogger(__name__)
 
 _ORDERS_QUERY = """
-query ($first: Int!, $after: String) {
-  orders(first: $first, after: $after) {
+query ($first: Int!, $after: String, $query: String) {
+  orders(first: $first, after: $after, query: $query) {
     edges {
       node {
         id
         name
         email
         createdAt
+        tags
         lineItems(first: 50) {
           edges {
             node {
@@ -31,6 +32,17 @@ query ($first: Int!, $after: String) {
               }
             }
           }
+        }
+        shippingAddress {
+          firstName
+          lastName
+          address1
+          address2
+          city
+          province
+          country
+          zip
+          phone
         }
         totalPriceSet {
           shopMoney {
@@ -48,14 +60,22 @@ query ($first: Int!, $after: String) {
 }
 """
 
+_TAGS_ADD_MUTATION = """
+mutation tagsAdd($id: ID!, $tags: [String!]!) {
+  tagsAdd(id: $id, tags: $tags) {
+    userErrors {
+      message
+    }
+  }
+}
+"""
+
 
 class ShopifyClient:
-    _API_VERSION = "2025-01"
-
     def __init__(self) -> None:
         self._endpoint = (
             f"https://{settings.shopify_shop_domain}"
-            f"/admin/api/{self._API_VERSION}/graphql.json"
+            f"/admin/api/2026-01/graphql.json"
         )
         self._session = requests.Session()
         self._session.headers.update({
@@ -97,10 +117,11 @@ class ShopifyClient:
         raise RuntimeError("Shopify API max retries exceeded.")
 
     def iter_orders(self) -> Generator[dict[str, Any], None, None]:
+        query_filter = f"created_at:>={settings.orders_since} status:open"
         cursor: str | None = None
 
         while True:
-            variables: dict[str, Any] = {"first": 10}
+            variables: dict[str, Any] = {"first": 10, "query": query_filter}
             if cursor:
                 variables["after"] = cursor
 
@@ -114,3 +135,8 @@ class ShopifyClient:
                 break
 
             cursor = orders["pageInfo"]["endCursor"]
+
+    def mark_routed(self, order_id: str, warehouse: str) -> None:
+        tag = f"routed-to-{warehouse.lower()}"
+        self._execute(_TAGS_ADD_MUTATION, {"id": order_id, "tags": [tag]})
+        logger.info("Tagged order %s with '%s'.", order_id, tag)

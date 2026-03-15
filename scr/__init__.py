@@ -1,16 +1,11 @@
-from .config import settings
-from .models import Order, LineItem
+from .models import Order, LineItem, Address
 from .shopify import ShopifyClient
-from .router import route, Warehouse
+from .router import route, Warehouse, register
 from .warehouses import EUWarehouseClient, USWarehouseClient
 
 __all__ = [
-    "settings",
-    "Order",
-    "LineItem",
+    "Order", "LineItem", "Address",
     "ShopifyClient",
-    "route",
-    "Warehouse",
-    "EUWarehouseClient",
-    "USWarehouseClient",
+    "route", "Warehouse", "register",
+    "EUWarehouseClient", "USWarehouseClient",
 ]
