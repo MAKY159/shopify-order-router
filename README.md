@@ -26,11 +26,11 @@ Fill in `.env` with your credentials.
 
 ## Credentials
 
-**Shopify** — Admin API access token (`shpat_...`) with `read_orders` and `write_orders` scopes.
+**Shopify** - Admin API access token (`shpat_...`) with `read_orders` and `write_orders` scopes.
 
-**ShipBob** — Personal Access Token from Integrations → API Tokens. Channel ID from `GET https://api.shipbob.com/2026-01/channel` — use the one with `orders_write` scope.
+**ShipBob** - Personal Access Token from Integrations → API Tokens. Channel ID from `GET https://api.shipbob.com/2026-01/channel` — use the one with `orders_write` scope.
 
-**DCL** — HTTP Basic Auth (username + password). Account number included in every order payload.
+**DCL** - HTTP Basic Auth (username + password). Account number included in every order payload.
 
 ## Run
 
